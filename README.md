@@ -1,0 +1,102 @@
+# TestCase Tracker
+
+A checklist-based test case tracker with username-only auth, auto-save checkboxes, and PostgreSQL persistence. Organize tests into categories, track pass/fail status, and sync everything automatically.
+
+## Features
+
+- **Username-based auth** — no password needed; just register with a name
+- **Category management** — create/delete test categories (Feature, Unit, API, etc.)
+- **Checkbox tracking** — mark tests as passing/failing with auto-save
+- **Search** — filter categories by name
+- **Export/Import** — download your data as JSON or restore it later
+- **Reset all** — clear all checkboxes at once
+
+## Tech Stack
+
+| Layer | Tech |
+|-------|------|
+| Backend | Node.js, Express |
+| Database | PostgreSQL (Supabase) |
+| Schema | Prisma ORM |
+| Frontend | Vanilla HTML, CSS, JS |
+| Runtime query | [postgres](https://github.com/porsager/postgres) library |
+
+## Project Structure
+
+```
+.
+├── server.js              # Entry point — mounts middleware + routes
+├── src/
+│   ├── config/
+│   │   └── db.js          # PostgreSQL connection (postgres library)
+│   ├── models/
+│   │   ├── Profile.js     # Profile DB queries (find, create)
+│   │   ├── Category.js    # Category DB queries (get, create, delete)
+│   │   ├── Item.js        # Item DB queries (upsert, delete, seed)
+│   │   ├── Data.js        # Combined fetch/replace for profile data
+│   │   └── seed.js        # Default seed data + token generator
+│   └── routes/
+│       ├── auth.js        # POST /api/auth/register, /api/auth/login
+│       ├── data.js        # GET/PUT /api/data
+│       └── export.js      # GET /api/export, POST /api/import
+├── public/
+│   ├── index.html         # Single-page app
+│   ├── style.css          # Styling
+│   └── js/
+│       ├── auth.js        # Auth UI + login/register logic
+│       └── app.js         # Dashboard, CRUD, export/import
+├── prisma/
+│   └── schema.prisma      # Database schema (Profile → Category → Item)
+├── prisma.config.ts       # Prisma v7 config
+├── package.json
+└── .env                   # DATABASE_URL, DIRECT_URL
+```
+
+## Database Schema
+
+Three normalized tables managed via Prisma:
+
+```
+profiles → categories → items
+  id          id           id
+  username    name         name
+  token       profile_id   checked
+  created_at  created_at   category_id
+                           created_at
+```
+
+## Quick Start
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Configure environment
+cp .env.example .env
+# Edit .env with your Supabase connection strings
+
+# 3. Sync database schema
+npm run db:push
+
+# 4. Start server
+npm start
+```
+
+Open `http://localhost:3000` in your browser.
+
+## API Endpoints
+
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/api/auth/register` | Create account (username only) |
+| POST | `/api/auth/login` | Login (returns token) |
+| GET | `/api/data` | Fetch user's categories + items |
+| PUT | `/api/data` | Save categories + items |
+| GET | `/api/export` | Download data as JSON |
+| POST | `/api/import` | Restore data from JSON |
+
+Registration seeds 5 default categories (Feature, Unit, API, Browser, Security) with sample test items.
+
+## Deployment
+
+Requires PostgreSQL. [Supabase](https://supabase.com) is recommended — use the pooled connection URL (`DATABASE_URL`, port 6543) for runtime queries and the direct URL (`DIRECT_URL`, port 5432) for Prisma migrations.

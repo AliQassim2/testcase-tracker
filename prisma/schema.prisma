@@ -1,0 +1,41 @@
+generator client {
+    provider = "prisma-client-js"
+}
+
+datasource db {
+    provider = "postgresql"
+}
+
+model Profile {
+    id         String     @id @default(uuid()) @db.Uuid
+    username   String     @unique
+    token      String     @unique
+    categories Category[]
+    createdAt  DateTime   @default(now()) @map("created_at")
+
+    @@map("profiles")
+}
+
+model Category {
+    id        String   @id @default(uuid()) @db.Uuid
+    name      String
+    profileId String   @map("profile_id") @db.Uuid
+    profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+    items     Item[]
+    createdAt DateTime @default(now()) @map("created_at")
+
+    @@unique([profileId, name])
+    @@map("categories")
+}
+
+model Item {
+    id         String   @id @default(uuid()) @db.Uuid
+    name       String
+    checked    Boolean  @default(false)
+    categoryId String   @map("category_id") @db.Uuid
+    category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+    createdAt  DateTime @default(now()) @map("created_at")
+
+    @@unique([categoryId, name])
+    @@map("items")
+}

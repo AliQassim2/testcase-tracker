@@ -14,6 +14,10 @@ app.use('/api/auth', authRoutes)
 app.use('/api/data', dataRoutes)
 app.use('/api', exportRoutes)
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`)
-})
+export default app
+
+if (process.argv[1] && !process.argv[1].includes('.vercel')) {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`)
+    })
+}

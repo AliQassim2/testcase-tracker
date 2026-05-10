@@ -25,7 +25,8 @@ A checklist-based test case tracker with username-only auth, auto-save checkboxe
 
 ```
 .
-├── server.js              # Entry point — mounts middleware + routes
+├── server.js              # Entry point — Express app (local + Vercel)
+├── vercel.json            # Vercel deployment config
 ├── src/
 │   ├── config/
 │   │   └── db.js          # PostgreSQL connection (postgres library)
@@ -99,4 +100,24 @@ Registration seeds 5 default categories (Feature, Unit, API, Browser, Security) 
 
 ## Deployment
 
-Requires PostgreSQL. [Supabase](https://supabase.com) is recommended — use the pooled connection URL (`DATABASE_URL`, port 6543) for runtime queries and the direct URL (`DIRECT_URL`, port 5432) for Prisma migrations.
+### Vercel (recommended)
+
+[![Deploy to Vercel](https://vercel.com/button)](https://vercel.com/new)
+
+1. Push to GitHub and import your repo in Vercel
+2. Add environment variables in Vercel dashboard:
+   - `DATABASE_URL` — your Supabase pooled connection string (port 6543)
+   - `DIRECT_URL` — your Supabase direct connection string (port 5432)
+3. Deploy — `vercel.json` handles everything automatically
+4. Run `npm run db:push` locally (or via Vercel CLI) to sync the schema
+
+### Traditional server
+
+Requires PostgreSQL. [Supabase](https://supabase.com) is recommended — use the pooled URL for runtime and direct URL for migrations.
+
+```bash
+npm install
+cp .env.example .env   # fill in your DB credentials
+npm run db:push         # sync schema
+npm start               # starts on port 3000
+```

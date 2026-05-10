@@ -25,9 +25,10 @@ A checklist-based test case tracker with username-only auth, auto-save checkboxe
 
 ```
 .
-├── server.js              # Entry point — Express app (local + Vercel)
-├── vercel.json            # Vercel deployment config
+├── api/
+│   └── index.js           # Vercel serverless entry — re-exports Express app
 ├── src/
+│   ├── app.js             # Express app setup (middleware + routes)
 │   ├── config/
 │   │   └── db.js          # PostgreSQL connection (postgres library)
 │   ├── models/
@@ -46,6 +47,7 @@ A checklist-based test case tracker with username-only auth, auto-save checkboxe
 │   └── js/
 │       ├── auth.js        # Auth UI + login/register logic
 │       └── app.js         # Dashboard, CRUD, export/import
+├── server.js              # Local dev entry — starts Express on port 3000
 ├── prisma/
 │   └── schema.prisma      # Database schema (Profile → Category → Item)
 ├── prisma.config.ts       # Prisma v7 config
@@ -108,7 +110,7 @@ Registration seeds 5 default categories (Feature, Unit, API, Browser, Security) 
 2. Add environment variables in Vercel dashboard:
    - `DATABASE_URL` — your Supabase pooled connection string (port 6543)
    - `DIRECT_URL` — your Supabase direct connection string (port 5432)
-3. Deploy — `vercel.json` handles everything automatically
+3. Deploy — Vercel auto-detects `api/index.js` as the serverless entry
 4. Run `npm run db:push` locally (or via Vercel CLI) to sync the schema
 
 ### Traditional server
